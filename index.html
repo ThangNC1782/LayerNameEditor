@@ -73,15 +73,12 @@ document.getElementById("getLayers").onclick = function () {
 
 window.addEventListener("message", function (event) {
 
-    console.log("MESSAGE:", event.data);
-
-    if (event.data === "done") {
-        return;
-    }
+    console.log("MESSAGE DATA:", event.data);
+    console.log("MESSAGE TYPE:", typeof event.data);
 
     status.textContent =
         "Received:\n\n" +
-        event.data;
+        JSON.stringify(event.data);
 
 });
 
