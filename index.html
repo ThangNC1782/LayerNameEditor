@@ -62,10 +62,60 @@ const status = document.getElementById("status");
 
 document.getElementById("getLayers").onclick = function () {
 
-    status.textContent = "Requesting document name...";
+    status.textContent = "Requesting document...";
+
+    const script = `
+        (function () {
+
+            if (!app.documents.length) {
+                app.echoToOE(JSON.stringify({
+                    error: "NO_DOCUMENT"
+                }));
+                return;
+            }
+
+            var doc = app.activeDocument;
+
+            function readLayers(layers) {
+
+                var result = [];
+
+                for (var i = 0; i < layers.length; i++) {
+
+                    var layer = layers[i];
+
+                    var item = {
+                        name: layer.name,
+                        selected: !!layer.selected
+                    };
+
+                    try {
+                        if (layer.layers && layer.layers.length > 0) {
+                            item.children = readLayers(layer.layers);
+                        }
+                    } catch (e) {
+                    }
+
+                    result.push(item);
+                }
+
+                return result;
+            }
+
+            var data = {
+                document: doc.name,
+                width: doc.width,
+                height: doc.height,
+                layers: readLayers(doc.layers)
+            };
+
+            app.echoToOE(JSON.stringify(data));
+
+        })();
+    `;
 
     window.parent.postMessage(
-        'app.echoToOE("HELLO_FROM_PHOTOPEA")',
+        script,
         "*"
     );
 };
@@ -76,9 +126,25 @@ window.addEventListener("message", function (event) {
     console.log("MESSAGE DATA:", event.data);
     console.log("MESSAGE TYPE:", typeof event.data);
 
-    status.textContent =
-        "Received:\n\n" +
-        JSON.stringify(event.data);
+    var data = event.data;
+
+    try {
+
+        if (typeof data === "string") {
+            data = JSON.parse(data);
+        }
+
+        status.textContent =
+            "Received:\n\n" +
+            JSON.stringify(data, null, 2);
+
+    } catch (e) {
+
+        status.textContent =
+            "Received:\n\n" +
+            String(event.data);
+
+    }
 
 });
 
