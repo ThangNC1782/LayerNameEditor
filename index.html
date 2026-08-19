@@ -75,6 +75,10 @@ window.addEventListener("message", function (event) {
 
     console.log("MESSAGE:", event.data);
 
+    if (event.data === "done") {
+        return;
+    }
+
     status.textContent =
         "Received:\n\n" +
         event.data;
