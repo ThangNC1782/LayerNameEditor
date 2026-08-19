@@ -65,7 +65,7 @@ document.getElementById("getLayers").onclick = function () {
     status.textContent = "Requesting document name...";
 
     window.parent.postMessage(
-        'app.echoToOE(app.activeDocument ? app.activeDocument.name : "NO DOCUMENT")',
+        'app.echoToOE("HELLO_FROM_PHOTOPEA")',
         "*"
     );
 };
